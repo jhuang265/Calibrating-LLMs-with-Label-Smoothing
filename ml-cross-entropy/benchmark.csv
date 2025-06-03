@@ -1,0 +1,4 @@
+,method,kind,smoothing,runtime_ms,op_mem_mb,test_data
+0,cce,loss-fw,,19.975872039794922,0.09375,tinyllama
+1,cce,loss-fw,-1.0,61.13532638549805,158.216796875,tinyllama
+2,cce,loss-fw,0.0,1841.0128173828125,0.09375,tinyllama
