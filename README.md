@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is the official repository for the supporting code to our paper Calibrated Language Models and How to Find Them with Label Smoothing, to be presented at ICML 2025.
+This is the official repository for the supporting code to our paper __Calibrated Language Models and How to Find Them with Label Smoothing__, presented at ICML 2025.
 
 This repository is built off of two public repositories
 
@@ -13,7 +13,7 @@ Each of these is included in their own separate folder and contains their own `r
 
 ## FAQ
 
-Here are some issues that we ran into that may be helpful
+Here are some issues that we ran into that may be helpful.
 
 ### Installing `flash-attn` is slow.
 
@@ -23,6 +23,19 @@ We ran into this and our solution was to install the package directly from the w
 
 You may have to add some handling code in `open-instruct/open_instruct/dataset_transformation.py` if your tokenizer isn't directly supported.
 
+### CUDA Out of Memory
+
+We generally suggest to use at least 4 NVIDIA A100 80GB for training models. For testing/benchmarking, only a single 80GB GPU is necessary, but this can vary depending on the model (Gemma2 does not use `flash-attention` and therefore may require more resources).
+
 ## Citation
 
-To be added upon publication of proceedings.
+```
+@inproceedings{
+    huang2025calibrated,
+    title={Calibrated Language Models and How to Find Them with Label Smoothing},
+    author={Jerry Huang and Peng Lu and QIUHAO Zeng},
+    booktitle={Forty-second International Conference on Machine Learning},
+    year={2025},
+    url={https://openreview.net/forum?id=soLNj4l2EL}
+}
+```
