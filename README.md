@@ -27,6 +27,10 @@ You may have to add some handling code in `open-instruct/open_instruct/dataset_t
 
 We generally suggest to use at least 4 NVIDIA A100 80GB for training models. For testing/benchmarking, only a single 80GB GPU is necessary, but this can vary depending on the model (Gemma2 does not use `flash-attention` and therefore may require more resources).
 
+#### Gemma models run out of memory more quickly.
+
+Gemma models (from HuggingFace, as supported by `open-instruct`) use an `eager` attention implementation as opposed to `flash-attn`, thus these models usually consume more memory when training or used for inference. We suggest usually doubling the available memory compared to models that use `flash-attn` in these cases (ex. use 8 GPUs instead of 4 if a model using `flash-attn` requires at least this many for training). In our own case, we only had 8 GPUs available thus were not able to train beyond the 2B Gemma models.
+
 ## Citation
 
 ```
