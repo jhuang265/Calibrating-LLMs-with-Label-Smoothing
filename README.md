@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is the official repository for the supporting code to our paper __Calibrated Language Models and How to Find Them with Label Smoothing__, presented at ICML 2025.
+This is the official repository for the supporting code to our paper __[Calibrated Language Models and How to Find Them with Label Smoothing](https://proceedings.mlr.press/v267/huang25w.html)__, presented at ICML 2025.
 
 This repository is built off of two public repositories
 
