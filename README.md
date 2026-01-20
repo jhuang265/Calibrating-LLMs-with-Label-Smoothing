@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is the official repository for the supporting code to our paper __[Calibrated Language Models and How to Find Them with Label Smoothing](https://proceedings.mlr.press/v267/huang25w.html)__, presented at ICML 2025.
+This is the official repository for the supporting code to our paper __[Calibrated Language Models and How to Find Them with Label Smoothing](https://proceedings.mlr.press/v267/huang25w.html)__, presented at ICML 2025. It also contains the base code for the work __[Investigating the Multilingual Calibration Effects of Language Model Instruction-Tuning]__, presented at EACL 2026.
 
 This repository is built off of two public repositories
 
@@ -34,6 +34,16 @@ Gemma models (from HuggingFace, as supported by `open-instruct`) use an `eager` 
 ## Citation
 
 ```
+@misc{huang2026investigatingmultilingualcalibrationeffects,
+      title={Investigating the Multilingual Calibration Effects of Language Model Instruction-Tuning}, 
+      author={Jerry Huang and Peng Lu and Qiuhao Zeng and Yusuke Iwasawa and Yutaka Matsuo and Sarath Chandar and Edison Marrese-Taylor and Irene Li},
+      year={2026},
+      eprint={2601.01362},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2601.01362}, 
+}
+
 @inproceedings{
     huang2025calibrated,
     title={Calibrated Language Models and How to Find Them with Label Smoothing},
@@ -42,4 +52,5 @@ Gemma models (from HuggingFace, as supported by `open-instruct`) use an `eager` 
     year={2025},
     url={https://openreview.net/forum?id=soLNj4l2EL}
 }
+
 ```
