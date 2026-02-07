@@ -853,9 +853,9 @@ class DatasetConfig:
             )
         else:
             # commit hash only works for hf datasets
-            self.dataset_commit_hash = get_commit_hash(
-                self.dataset_name, self.dataset_revision, "README.md", "dataset"
-            )
+            # self.dataset_commit_hash = get_commit_hash(
+            #     self.dataset_name, self.dataset_revision, "README.md", "dataset"
+            # )
             self.dataset = load_dataset(
                 self.dataset_name,
                 split=self.dataset_split,

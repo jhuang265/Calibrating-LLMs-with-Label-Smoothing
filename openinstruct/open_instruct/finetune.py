@@ -55,11 +55,6 @@ from open_instruct.utils import (
     clean_last_n_checkpoints,
     get_last_checkpoint_path,
     get_wandb_tags,
-    is_beaker_job,
-    launch_ai2_evals_on_weka,
-    maybe_get_beaker_config,
-    maybe_use_ai2_hf_entity,
-    maybe_use_ai2_wandb_entity,
 )
 
 logger = get_logger(__name__)
@@ -349,7 +344,7 @@ class FlatArguments:
     """The wandb's project name"""
     wandb_entity: Optional[str] = None
     """The entity (team) of wandb's project"""
-    push_to_hub: bool = True
+    push_to_hub: bool = False
     """Whether to upload the saved model to huggingface"""
     hf_entity: Optional[str] = None
     """The user or org name of the model repository from the Hugging Face Hub"""
@@ -359,22 +354,8 @@ class FlatArguments:
     """The revision of the saved model in the Hugging Face Hub (can be autoset if not given)"""
     hf_repo_url: Optional[str] = None
     """The url of the saved model in the Hugging Face Hub (will be autoset)"""
-    try_launch_beaker_eval_jobs: bool = True
-    """Whether to launch beaker evaluation jobs after training"""
-    hf_metadata_dataset: Optional[str] = "allenai/tulu-3-evals"
-    """What dataset to upload the metadata to. If unset, don't upload metadata"""
     cache_dataset_only: bool = False
     """Immediately exit after caching the dataset"""
-
-    # Ai2 specific settings
-    try_auto_save_to_beaker: bool = True
-    """Whether to try to save the model to Beaker dataset `/output` after training"""
-    gs_bucket_path: Optional[str] = None
-    """The path to the gs bucket to save the model to"""
-    oe_eval_tasks: Optional[List[str]] = None
-    """The beaker evaluation tasks to launch"""
-    oe_eval_max_length: int = 4096
-    """the max generation length for evaluation for oe-eval"""
 
     def __post_init__(self):
         if self.reduce_loss not in ["mean", "sum"]:
@@ -407,13 +388,12 @@ def main(args: FlatArguments):
     # Initialize the accelerator. We will let the accelerator handle device placement for us in this example.
     # If we're using tracking, we also need to initialize it here and it will by default pick up all supported trackers
     # in the environment
-    args.run_name = f"{args.exp_name}__{args.seed}__{int(time.time())}"
-    args.output_dir = os.path.join(args.output_dir, args.run_name)
+    args.run_name = f"{args.exp_name}__{args.seed}"
+    # args.output_dir = os.path.join(args.output_dir, args.run_name)
+
     if args.push_to_hub:
         if args.hf_repo_id is None:  # auto-generate one
             args.hf_repo_id = "open_instruct_dev"
-        if args.hf_entity is None:  # first try to use AI2 entity
-            args.hf_entity = maybe_use_ai2_hf_entity()
         if args.hf_entity is None:  # then try to use the user's entity
             args.hf_entity = HfApi().whoami()["name"]
         args.hf_repo_id = f"{args.hf_entity}/{args.hf_repo_id}"
@@ -696,11 +676,6 @@ def main(args: FlatArguments):
         # TensorBoard cannot log Enums, need the raw value
         experiment_config["lr_scheduler_type"] = experiment_config["lr_scheduler_type"]
 
-        # (Optional) Ai2 internal tracking
-        if args.wandb_entity is None:
-            args.wandb_entity = maybe_use_ai2_wandb_entity()
-        if is_beaker_job():
-            experiment_config.update(vars(beaker_config))
         accelerator.init_trackers(
             args.wandb_project_name,
             experiment_config,
@@ -905,26 +880,8 @@ def main(args: FlatArguments):
 
     # remove all checkpoints to save space
     if accelerator.is_local_main_process:
-        clean_last_n_checkpoints(args.output_dir, keep_last_n_checkpoints=0)
-
-    if (
-        args.try_auto_save_to_beaker
-        and accelerator.is_main_process
-        and is_beaker_job()
-        and len(beaker_config.beaker_dataset_id_urls) > 0
-        and args.output_dir.rstrip("/") != "/output"
-    ):
-        shutil.copytree(args.output_dir, "/output", dirs_exist_ok=True)
-
-    if is_beaker_job() and accelerator.is_main_process and args.try_launch_beaker_eval_jobs:
-        launch_ai2_evals_on_weka(
-            path=args.output_dir,
-            leaderboard_name=args.hf_repo_revision,
-            oe_eval_max_length=args.oe_eval_max_length,
-            wandb_url=wandb_tracker.run.get_url(),
-            oe_eval_tasks=args.oe_eval_tasks,
-            gs_bucket_path=args.gs_bucket_path,
-        )
+        clean_last_n_checkpoints(args.output_dir, keep_last_n_checkpoints=args.keep_last_n_checkpoints)
+        
     if args.push_to_hub:
         push_folder_to_hub(
             accelerator,
@@ -932,6 +889,7 @@ def main(args: FlatArguments):
             args.hf_repo_id,
             args.hf_repo_revision,
         )
+
     accelerator.wait_for_everyone()
     if args.with_tracking:
         accelerator.end_training()

@@ -16,8 +16,5 @@ weight_decay: 0.0
 num_train_epochs: 2
 output_dir: output/tulu3.2_1b
 with_tracking: true
-report_to:
-  - wandb
 logging_steps: 1000
-checkpointing_steps: epoch
 dataset_mix_dir: output/tulu3.2_1b
